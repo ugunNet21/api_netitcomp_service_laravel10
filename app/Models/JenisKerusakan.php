@@ -11,6 +11,6 @@ class JenisKerusakan extends Model
     protected $fillable = ['nama_jenis_kerusakan', 'deskripsi'];
     public function pemesanan()
     {
-        return $this->belongsToMany(Pemesanan::class, 'pemesanan__jenis_kerusakans');
+        return $this->belongsToMany(Pemesanan::class, 'pemesanan_jenis_kerusakans');
     }
 }

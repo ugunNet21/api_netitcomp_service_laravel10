@@ -15,6 +15,6 @@ class Pemesanan extends Model
     }
     public function jenisKerusakan()
     {
-        return $this->belongsToMany(JenisKerusakan::class, 'pemesanan__jenis_kerusakans');
+        return $this->belongsToMany(JenisKerusakan::class, 'pemesanan_jenis_kerusakans');
     }
 }
