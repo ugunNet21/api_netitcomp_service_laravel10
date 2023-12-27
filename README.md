@@ -18,7 +18,7 @@ Pastikan Anda telah menginstal [Composer](https://getcomposer.org/) dan [Node.js
 1. Clone repositori ini:
 
     ```bash
-    git clone https://github.com/username/nama-proyek.git
+    git clone https://github.com/ugunNet21/api_netitcomp_service_laravel10.git
     ```
 
 2. Pindah ke direktori proyek:
