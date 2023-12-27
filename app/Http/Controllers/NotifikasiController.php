@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notifikasi;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class NotifikasiController extends Controller
@@ -11,32 +12,68 @@ class NotifikasiController extends Controller
     {
         try {
             $notifikasi = Notifikasi::all();
+
             if ($notifikasi->count() > 0) {
+                $formattedNotifikasi = $notifikasi->map(function ($item) {
+                    return $this->formatNotifikasi($item);
+                });
+
                 return response()->json([
                     'status' => true,
                     'message' => "Data Available",
-                    'data' => $notifikasi,
+                    'data' => $formattedNotifikasi,
                 ], 200);
             } else {
                 return response()->json([
                     'status' => false,
                     'message' => "Data Not Available",
-                    'data' => null
+                    'data' => null,
                 ], 404);
             }
-            return response()->json($notifikasi);
         } catch (\Exception $e) {
             return response()->json([
-                'satatus' => false,
-                'erro' => $e->getMessage(),
+                'status' => false,
+                'error' => $e->getMessage(),
             ]);
         }
     }
 
+    private function formatNotifikasi($notifikasi)
+    {
+        return [
+            'id' => $notifikasi->id,
+            'judul' => $notifikasi->judul,
+            'isi_pesan' => $notifikasi->isi_pesan,
+            'tanggal_dikirim' => Carbon::parse($notifikasi->tanggal_dikirim)->format('Y-m-d H:i:s'),
+            'pemesanan_id' => $notifikasi->pemesanan_id,
+            'created_at' => Carbon::parse($notifikasi->created_at)->format('Y-m-d H:i:s'),
+            'updated_at' => Carbon::parse($notifikasi->updated_at)->format('Y-m-d H:i:s'),
+        ];
+    }
+
     public function show($id)
     {
-        $notifikasi = Notifikasi::findOrFail($id);
-        return response()->json($notifikasi);
+        try {
+            $notifikasi = Notifikasi::findOrFail($id);
+            $formattedNotifikasi = $this->formatNotifikasi($notifikasi);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Available',
+                'data' => $formattedNotifikasi,
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data Not Found',
+                'data' => null,
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function store(Request $request)
@@ -49,7 +86,14 @@ class NotifikasiController extends Controller
         ]);
 
         $notifikasi = Notifikasi::create($request->all());
-        return response()->json($notifikasi, 201);
+        // Memformat tanggal dan waktu
+        $formattedNotifikasi = $this->formatNotifikasi($notifikasi);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data Created Successfully',
+            'data' => $formattedNotifikasi,
+        ], 201);
     }
 
     public function update(Request $request, $id)
@@ -64,7 +108,13 @@ class NotifikasiController extends Controller
         $notifikasi = Notifikasi::findOrFail($id);
         $notifikasi->update($request->all());
 
-        return response()->json($notifikasi, 200);
+        $formattedNotifikasi = $this->formatNotifikasi($notifikasi);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data Updated Successfully',
+            'data' => $formattedNotifikasi,
+        ], 200);
     }
 
     public function destroy($id)
@@ -72,6 +122,9 @@ class NotifikasiController extends Controller
         $notifikasi = Notifikasi::findOrFail($id);
         $notifikasi->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'status' => true,
+            'message' => 'Data Deleted Successfully',
+        ], 204);
     }
 }
